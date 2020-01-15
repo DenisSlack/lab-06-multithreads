@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-#include "brute_force_hash.h"
+#include "../include/brute_force_hash.h"
 
 int main(int argc, char* argv[]) {
   size_t num_thread = std::thread::hardware_concurrency();
