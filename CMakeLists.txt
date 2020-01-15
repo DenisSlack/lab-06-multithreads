@@ -25,6 +25,9 @@ string(APPEND CMAKE_CXX_FLAGS " -pedantic -Werror -Wall -Wextra")
 string(APPEND CMAKE_CXX_FLAGS " -Wno-unused-command-line-argument")
 string(APPEND CMAKE_CXX_FLAGS " -Wshadow -Wnon-virtual-dtor")
 
+
+hunter_add_package(GTest)
+find_package(GTest CONFIG REQUIRED)
 hunter_add_package(Boost COMPONENTS filesystem log system thread)
 find_package(Boost CONFIG REQUIRED filesystem log log_setup system thread)
 find_package(Threads)
@@ -53,4 +56,29 @@ target_link_libraries(
         Boost::filesystem
         Boost::system
 )
+
+add_executable(tests
+        ${CMAKE_CURRENT_SOURCE_DIR}/tests/test.cpp
+        )
+
+target_link_libraries(
+        tests
+        ${CMAKE_THREAD_LIBS_INIT}
+        GTest::gtest
+        GTest::main
+)
+
+enable_testing()
+add_test(NAME unit_tests COMMAND tests)
+
+if (BUILD_COVERAGE)
+    set(ENABLE_COVERAGE ON CACHE BOOL "Enable coverage build." FORCE)
+    list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+    find_package(codecov)
+    add_coverage(${PROJECT_NAME})
+    add_coverage(tests)
+    list(APPEND LCOV_REMOVE_PATTERNS "'${PROJECT_SOURCE_DIR}/tests/*'")
+    coverage_evaluate()
+endif ()
+
 
